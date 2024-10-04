@@ -3,6 +3,19 @@
 #include <string>
 #include <algorithm>
 #include <cctype>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+// Knuth (Fisher-Yates) shuffle
+void knuthShuffle(std::vector<std::string>& arr) {
+    std::srand(static_cast<unsigned int>(std::time(nullptr))); // seed random number generator
+
+    for (int i = arr.size() - 1; i > 0; --i) {
+        int j = std::rand() % (i + 1); // generate random index between 0 and i
+        std::swap(arr[i], arr[j]); // swap current element with random element
+    }
+}
 // Define a template class Node. It is a generic container for any type T.
 template <typename T> 
 class Node {
@@ -127,15 +140,39 @@ int main() {
 
     std::string line;
     int palindromeCount = 0;  // Counter for palindrome
+    std::vector<std::string> items;  // Store all items
+    std::vector<std::string> palindromes;  // Store only palindromes
 
+    // Read each line from the file into the vector
     while (std::getline(inputFile, line)) {
+        items.push_back(line);  // Store all lines for shuffling
         if (isPalindrome(line)) {
-            std::cout << "Palindrome: " << line << std::endl;// 🗣️🗣️🗣️ print the palindrome
+            palindromes.push_back(line);  // Store only palindromes
             palindromeCount++;
         }
     }
 
-    std::cout << "Palindromes: " << palindromeCount << std::endl;
+
+    std::cout << "\nTotal Palindromes: " << palindromeCount << std::endl;
+    std::cout << "\nPalindromes before shuffle:\n";
+    for (const std::string& palindrome : palindromes) {
+        std::cout << palindrome << std::endl;
+    }
+
+   
+    std::cout << "\nData before shuffle:\n";
+    for (const std::string& item : items) {
+        std::cout << item << std::endl;
+    }
+
+    // Shuffle the full set of data
+    knuthShuffle(items);
+
+ 
+    std::cout << "\nData after shuffle:\n";
+    for (const std::string& item : items) {
+        std::cout << item << std::endl;
+    }
 
     inputFile.close();
     return 0;
