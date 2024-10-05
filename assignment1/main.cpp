@@ -18,17 +18,7 @@ void capitalizeFirstLetter(std::vector<std::string> &arr)
         }
     }
 }
-// Knuth (Fisher-Yates) shuffle
-void knuthShuffle(std::vector<std::string> &arr)
-{
-    std::srand(static_cast<unsigned int>(std::time(nullptr))); // seed random number generator
 
-    for (int i = arr.size() - 1; i > 0; --i)
-    {
-        int j = std::rand() % (i + 1); // generate random index between 0 and i
-        std::swap(arr[i], arr[j]);     // swap current element with random element
-    }
-}
 // Define a template class Node. It is a generic container for any type T.
 template <typename T>
 class Node
@@ -165,6 +155,17 @@ bool isPalindrome(const std::string &str)
     }
 
     return true;
+}
+// Knuth (Fisher-Yates) shuffle
+void knuthShuffle(std::vector<std::string> &arr)
+{
+    std::srand(static_cast<unsigned int>(std::time(nullptr))); // seed random number generator
+
+    for (int i = arr.size() - 1; i > 0; --i)
+    {
+        int j = std::rand() % (i + 1); // generate random index between 0 and i
+        std::swap(arr[i], arr[j]);     // swap current element with random element
+    }
 }
 // Selection Sort for strings with comparison count
 void selectionSort(std::vector<std::string> &arr, int &comparisonCount)
