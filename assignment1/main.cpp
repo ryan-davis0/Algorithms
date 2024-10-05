@@ -115,6 +115,7 @@ public:
         }
     }
 };
+
 // Selection Sort for strings with comparison count
 void selectionSort(std::vector<std::string>& arr, int& comparisonCount) {
     int n = arr.size();
@@ -136,6 +137,26 @@ void selectionSort(std::vector<std::string>& arr, int& comparisonCount) {
         }
     }
 }
+// Insertion Sort for strings with comparison count
+void insertionSort(std::vector<std::string>& arr, int& comparisonCount) {
+    int n = arr.size();
+    for (int i = 1; i < n; ++i) {
+        std::string key = arr[i];
+        int j = i - 1;
+
+        // Move elements of arr that are greater than key one pos ahead of current pos
+ 
+        while (j >= 0 && arr[j] > key) {
+            comparisonCount++; 
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        comparisonCount++; 
+        arr[j + 1] = key;
+    }
+}
+
+
 bool isPalindrome(const std::string& str) {
     Stack<char> stack;
     Queue<char> queue;
@@ -173,7 +194,7 @@ int main() {
 
     // Read each line from the file into the vector
     while (std::getline(inputFile, line)) {
-        items.push_back(line);  // Store all lines for shuffling
+        items.push_back(line);  
         if (isPalindrome(line)) {
             palindromes.push_back(line);  // Store only palindromes
             palindromeCount++;
@@ -181,26 +202,32 @@ int main() {
     }
 
     std::cout << "\nTotal Palindromes: " << palindromeCount << std::endl;
-    std::cout << "\nPalindromes before shuffle:\n";
     for (const std::string& palindrome : palindromes) {
         std::cout << palindrome << std::endl;
     }
 
     // Shuffle the full set of data
     knuthShuffle(items);
-  // Capitalize the first letter of each string it was annoying me that there were like 10 entries not capital
+    // Capitalize the first letter of each string it was annoying me that there were like 10 entries not capital
     capitalizeFirstLetter(items);
-    // Sort the shuffled data using Selection Sort
-    int comparisonCount = 0;
-    selectionSort(items, comparisonCount);
+    std::vector<std::string> copy = items;//no sorting different arrays that would 
+    //mess with our comparisons between sorting algorithims 
+    // Selection sort
+    int selectionComparisonCount = 0;
+    selectionSort(copy, selectionComparisonCount);
+      copy = items;
+    // Insertion Sort
+    int insertionComparisonCount = 0;
+    insertionSort(copy, insertionComparisonCount);
 
-  
-
-    std::cout << "\nData after sorting:\n";
-    for (const std::string& item : items) {
+    std::cout << "\nData after Insertion Sort:\n";
+    for (const std::string& item : copy) {
         std::cout << item << std::endl;
     }
- std::cout << "\nTotal Comparisons: " << comparisonCount << std::endl;
+
+    // Print comparison counts at the very end
+    std::cout << "\nTotal Comparisons for Selection Sort: " << selectionComparisonCount << std::endl;
+    std::cout << "Total Comparisons for Insertion Sort: " << insertionComparisonCount << std::endl;
 
     inputFile.close();
     return 0;
