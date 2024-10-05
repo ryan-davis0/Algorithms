@@ -7,6 +7,14 @@
 #include <cstdlib>
 #include <ctime>
 
+// Function to capitalize the first letter of each string
+void capitalizeFirstLetter(std::vector<std::string>& arr) {
+    for (std::string& str : arr) {
+        if (!str.empty()) {
+            str[0] = std::toupper(str[0]);
+        }
+    }
+}
 // Knuth (Fisher-Yates) shuffle
 void knuthShuffle(std::vector<std::string>& arr) {
     std::srand(static_cast<unsigned int>(std::time(nullptr))); // seed random number generator
@@ -107,7 +115,27 @@ public:
         }
     }
 };
+// Selection Sort for strings with comparison count
+void selectionSort(std::vector<std::string>& arr, int& comparisonCount) {
+    int n = arr.size();
 
+    for (int i = 0; i < n - 1; ++i) {
+        int min = i;
+
+        // Find the minimum element in the unsorted part
+        for (int j = i + 1; j < n; ++j) {
+            comparisonCount++;  // Increment comparison counter
+            if (arr[j] < arr[min]) {
+                min = j;
+            }
+        }
+
+        // Swap minimum element with  first element
+        if (min != i) {
+            std::swap(arr[i], arr[min]);
+        }
+    }
+}
 bool isPalindrome(const std::string& str) {
     Stack<char> stack;
     Queue<char> queue;
@@ -152,27 +180,27 @@ int main() {
         }
     }
 
-
     std::cout << "\nTotal Palindromes: " << palindromeCount << std::endl;
     std::cout << "\nPalindromes before shuffle:\n";
     for (const std::string& palindrome : palindromes) {
         std::cout << palindrome << std::endl;
     }
 
-   
-    std::cout << "\nData before shuffle:\n";
-    for (const std::string& item : items) {
-        std::cout << item << std::endl;
-    }
-
     // Shuffle the full set of data
     knuthShuffle(items);
+  // Capitalize the first letter of each string it was annoying me that there were like 10 entries not capital
+    capitalizeFirstLetter(items);
+    // Sort the shuffled data using Selection Sort
+    int comparisonCount = 0;
+    selectionSort(items, comparisonCount);
 
- 
-    std::cout << "\nData after shuffle:\n";
+  
+
+    std::cout << "\nData after sorting:\n";
     for (const std::string& item : items) {
         std::cout << item << std::endl;
     }
+ std::cout << "\nTotal Comparisons: " << comparisonCount << std::endl;
 
     inputFile.close();
     return 0;
