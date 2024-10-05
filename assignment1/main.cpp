@@ -398,11 +398,11 @@ int main()
     // Call the QuickSort function with comparison tracking
     quickSortArray(copy, 0, copy.size() - 1, quickComparisonCount);
 
-    std::cout << "\nData after Merge sort:\n";
-    for (const std::string &item : copy)
-    {
-        std::cout << item << std::endl;
-    }
+   // std::cout << "\nData after Quick sort:\n";
+  //  for (const std::string &item : copy)
+  //  {
+   //     std::cout << item << std::endl;
+  //  }
 
     // Print comparison counts at the very end
     std::cout << "\nTotal Comparisons for Selection Sort: " << selectionComparisonCount << std::endl;
