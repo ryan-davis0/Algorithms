@@ -155,6 +155,76 @@ void insertionSort(std::vector<std::string>& arr, int& comparisonCount) {
         arr[j + 1] = key;
     }
 }
+//merge time yay!
+//second nosebleed so far as well! 
+//making everything detailed cause i think i messed something up
+void mergeSort(std::vector<std::string>& arr, int leftIndex, int middleIndex, int rightIndex, int& comparisonCount) {
+    // Determine the sizes of the two subarrays
+    int leftSubarraySize = middleIndex - leftIndex + 1;  // Num elements in the left subarray
+    int rightSubarraySize = rightIndex - middleIndex;    // Num of elements in the right subarray
+
+    // Create temporary vectors to store elements from left and right subarrays
+    std::vector<std::string> leftSubarray(leftSubarraySize), rightSubarray(rightSubarraySize);
+
+    // Copy elements from the original array to the temporary left subarray
+    for (int i = 0; i < leftSubarraySize; i++) {
+        leftSubarray[i] = arr[leftIndex + i];
+    }
+
+    // Copy elements from the original array to the temporary right subarray
+    for (int j = 0; j < rightSubarraySize; j++) {
+        rightSubarray[j] = arr[middleIndex + 1 + j];
+    }
+
+    // Initialize pointers for leftSubarray (i), rightSubarray (j), and the merged array (k)
+    int leftPointer = 0, rightPointer = 0;
+    int mergedPointer = leftIndex; // Initial index for merged array starts at the beginning of the subarray
+
+// This loop continues as long as both leftPointer and rightPointer 
+// are within the bounds of their respective subarrays 
+    while (leftPointer < leftSubarraySize && rightPointer < rightSubarraySize) {
+        comparisonCount++;  // Count each comparison made between elements of the two subarrays
+
+        // Compare elements from leftSubarray and rightSubarray, and merge them in sorted order
+        if (leftSubarray[leftPointer] <= rightSubarray[rightPointer]) {
+            // If the current element in the leftSubarray is smaller or equal, place it in the merged array
+            arr[mergedPointer] = leftSubarray[leftPointer];
+            leftPointer++;  // Move to the next element in the leftSubarray
+        } else {
+            // If the current element in the rightSubarray is smaller, place it in the merged array
+            arr[mergedPointer] = rightSubarray[rightPointer];
+            rightPointer++;  // Move to the next element in the rightSubarray
+        }
+        mergedPointer++;  // Move to the next position in the merged array
+    }
+
+    // If there are remaining elements in the leftSubarray copy them to the merged array
+    while (leftPointer < leftSubarraySize) {
+        arr[mergedPointer] = leftSubarray[leftPointer];
+        leftPointer++;
+        mergedPointer++;
+    }
+
+    // If there are remaining elements in the rightSubarray copy them to the merged array
+    while (rightPointer < rightSubarraySize) {
+        arr[mergedPointer] = rightSubarray[rightPointer];
+        rightPointer++;
+        mergedPointer++;
+    }
+}
+// Helper function for recursive merge sort
+void mergeSortHelper(std::vector<std::string>& arr, int left, int right, int& comparisonCount) {
+    if (left < right) {
+        int middle = left + (right - left) / 2;
+
+        // Recursively sort the left and right halves
+        mergeSortHelper(arr, left, middle, comparisonCount);
+        mergeSortHelper(arr, middle + 1, right, comparisonCount);
+
+        // Merge the sorted halves
+        mergeSort(arr, left, middle, right, comparisonCount);
+    }
+}
 
 
 bool isPalindrome(const std::string& str) {
@@ -219,8 +289,12 @@ int main() {
     // Insertion Sort
     int insertionComparisonCount = 0;
     insertionSort(copy, insertionComparisonCount);
+  copy = items;
+    // Merge Sort
+    int mergeComparisonCount = 0;
+   mergeSortHelper(copy, 0, copy.size() - 1, mergeComparisonCount);
 
-    std::cout << "\nData after Insertion Sort:\n";
+    std::cout << "\nData after Merge sort:\n";
     for (const std::string& item : copy) {
         std::cout << item << std::endl;
     }
@@ -228,7 +302,7 @@ int main() {
     // Print comparison counts at the very end
     std::cout << "\nTotal Comparisons for Selection Sort: " << selectionComparisonCount << std::endl;
     std::cout << "Total Comparisons for Insertion Sort: " << insertionComparisonCount << std::endl;
-
+std::cout << "Total Comparisons for Merge Sort: " << mergeComparisonCount << std::endl;
     inputFile.close();
     return 0;
 }
