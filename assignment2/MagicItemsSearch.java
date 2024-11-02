@@ -80,8 +80,8 @@ public class MagicItemsSearch {
         return selection;
     }
 
-    // Perform Linear and Binary Searches, then calculate average comparisons
-    public static void performSearches(List<String> searchList) {
+    // Perform Linear and Binary Searches on the entire sorted list
+    public static void performSearches(List<String> sortedItems, List<String> searchList) {
         int totalLinearComparisons = 0;
         int totalBinaryComparisons = 0;
 
@@ -89,13 +89,13 @@ public class MagicItemsSearch {
             int[] linearCount = {0};
             int[] binaryCount = {0};
 
-            // Perform a linear search on the search list for the current item
-            linearSearch(searchList, searchItem, linearCount);
+            // Perform a linear search on the entire sortedItems list
+            linearSearch(sortedItems, searchItem, linearCount);
             totalLinearComparisons += linearCount[0];
             System.out.println("Linear comparisons for " + searchItem + ": " + linearCount[0]);
 
-            // Perform a binary search on the sorted search list for the current item
-            binarySearch(searchList, searchItem, binaryCount);
+            // Perform a binary search on the entire sortedItems list
+            binarySearch(sortedItems, searchItem, binaryCount);
             totalBinaryComparisons += binaryCount[0];
             System.out.println("Binary comparisons for " + searchItem + ": " + binaryCount[0]);
         }
@@ -128,12 +128,10 @@ public class MagicItemsSearch {
         int[] comparisonCount = {0};
         selectionSort(sortedItems, comparisonCount);
 
-        // Randomly select 42 items for search tests and sort them
+        // Randomly select 42 items for search tests
         List<String> searchList = randomSelection(sortedItems, 42);
-        selectionSort(searchList, new int[]{0});
 
-        // Perform both linear and binary searches on the sorted search list,
-        // then calculate and print average comparisons
-        performSearches(searchList);
+        // Perform both linear and binary searches on the entire sortedItems list
+        performSearches(sortedItems, searchList);
     }
 }
