@@ -3,6 +3,91 @@ import java.util.*;
 
 public class MagicItemsSearch {
 
+    // Hash table size
+    private static final int HASH_TABLE_SIZE = 250;
+
+    // Hash table with chaining
+    private static List<List<String>> hashTable = new ArrayList<>(HASH_TABLE_SIZE);
+
+    static {
+        // Initialize each bucket as an empty list for chaining
+        for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+            hashTable.add(new LinkedList<>());
+        }
+    }
+
+    // Hash function from the example code
+    private static int makeHashCode(String str) {
+        str = str.toUpperCase();
+        int letterTotal = 0;
+        for (int i = 0; i < str.length(); i++) {
+            letterTotal += str.charAt(i);
+        }
+        return letterTotal % HASH_TABLE_SIZE;
+    }
+
+    // Load items into the hash table
+    public static void loadHashTable(List<String> items) {
+        for (String item : items) {
+            int hashCode = makeHashCode(item);
+            hashTable.get(hashCode).add(item);
+        }
+    }
+
+    // Retrieve item from hash table and count comparisons
+    public static int retrieveFromHashTable(String item) {
+        int hashCode = makeHashCode(item);
+        List<String> bucket = hashTable.get(hashCode);
+        int comparisons = 0;
+        
+        for (String element : bucket) {
+            comparisons++;
+            if (element.equals(item)) {
+                break;
+            }
+        }
+
+        return comparisons;
+    }
+
+
+    //What a wholesome function! ❤️❤️❤️
+    public static void performAllSearches(List<String> sortedItems, List<String> searchList) {
+        int totalLinearComparisons = 0;
+        int totalBinaryComparisons = 0;
+        int totalHashComparisons = 0;
+
+        for (String searchItem : searchList) {
+            int[] linearCount = {0};
+            int[] binaryCount = {0};
+
+            // Perform a linear search on the entire sortedItems list
+            linearSearch(sortedItems, searchItem, linearCount);
+            totalLinearComparisons += linearCount[0];
+
+            // Perform a binary search on the entire sortedItems list
+            binarySearch(sortedItems, searchItem, binaryCount);
+            totalBinaryComparisons += binaryCount[0];
+
+            // Perform a hash table search on the same search list
+            int hashComparisons = retrieveFromHashTable(searchItem);
+            totalHashComparisons += hashComparisons;
+
+            //The unalligned columns add character :0 🫨🫨🫨
+            System.out.printf("Item: %-20s | Linear: %3d | Binary: %3d | Hash Table: %3d\n", 
+                              searchItem, linearCount[0], binaryCount[0], hashComparisons);
+        }
+
+        // Calculate averages
+        double averageLinear = (double) totalLinearComparisons / searchList.size();
+        double averageBinary = (double) totalBinaryComparisons / searchList.size();
+        double averageHash = (double) totalHashComparisons / searchList.size();
+
+        // I think I will name him Hunter 🎉🎉🎉
+        System.out.printf("\nAverages - Linear: %.2f | Binary: %.2f | Hash Table: %.2f\n",
+                          averageLinear, averageBinary, averageHash);
+    }
+
     // Function to capitalize the first letter of each string
     public static void capitalizeFirstLetter(List<String> arr) {
         for (int i = 0; i < arr.size(); i++) {
@@ -69,7 +154,8 @@ public class MagicItemsSearch {
         return -1;
     }
 
-    // Select 42 random items from array
+    // Select 42 random items from array 🃏🃏🃏
+    //consider balatro
     public static List<String> randomSelection(List<String> arr, int count) {
         List<String> selection = new ArrayList<>();
         Random rand = new Random();
@@ -78,33 +164,6 @@ public class MagicItemsSearch {
             selection.add(arr.get(randomIndex));
         }
         return selection;
-    }
-
-    // Perform Linear and Binary Searches on the entire sorted list
-    public static void performSearches(List<String> sortedItems, List<String> searchList) {
-        int totalLinearComparisons = 0;
-        int totalBinaryComparisons = 0;
-
-        for (String searchItem : searchList) {
-            int[] linearCount = {0};
-            int[] binaryCount = {0};
-
-            // Perform a linear search on the entire sortedItems list
-            linearSearch(sortedItems, searchItem, linearCount);
-            totalLinearComparisons += linearCount[0];
-            System.out.println("Linear comparisons for " + searchItem + ": " + linearCount[0]);
-
-            // Perform a binary search on the entire sortedItems list
-            binarySearch(sortedItems, searchItem, binaryCount);
-            totalBinaryComparisons += binaryCount[0];
-            System.out.println("Binary comparisons for " + searchItem + ": " + binaryCount[0]);
-        }
-
-        double averageLinear = (double) totalLinearComparisons / searchList.size();
-        double averageBinary = (double) totalBinaryComparisons / searchList.size();
-
-        System.out.printf("\nAverage Linear Search Comparisons: %.2f\n", averageLinear);
-        System.out.printf("Average Binary Search Comparisons: %.2f\n", averageBinary);
     }
 
     public static void main(String[] args) {
@@ -128,10 +187,13 @@ public class MagicItemsSearch {
         int[] comparisonCount = {0};
         selectionSort(sortedItems, comparisonCount);
 
+        // Load hash table with all items
+        loadHashTable(items);
+
         // Randomly select 42 items for search tests
         List<String> searchList = randomSelection(sortedItems, 42);
 
-        // Perform both linear and binary searches on the entire sortedItems list
-        performSearches(sortedItems, searchList);
+        // Perform all searches and print comparisons and averages
+        performAllSearches(sortedItems, searchList);
     }
 }
