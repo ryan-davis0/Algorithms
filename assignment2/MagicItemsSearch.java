@@ -40,11 +40,30 @@ public class MagicItemsSearch {
     }
 
     // Linear Search
-    public static int linearSearch(List<String> arr, String target, int[] comparisonCount) {
+    public static int linearSearch(List<String> arr, String searchItem, int[] comparisonCount) {
         for (int i = 0; i < arr.size(); i++) {
             comparisonCount[0]++;
-            if (arr.get(i).equals(target)) {
+            if (arr.get(i).equals(searchItem)) {
                 return i;
+            }
+        }
+        return -1;
+    }
+
+    // Binary Search with comparison count
+    public static int binarySearch(List<String> arr, String searchItem, int[] comparisonCount) {
+        int left = 0;
+        int right = arr.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            comparisonCount[0]++;
+            if (arr.get(mid).equals(searchItem)) {
+                return mid;
+            }
+            if (arr.get(mid).compareTo(searchItem) < 0) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
             }
         }
         return -1;
@@ -61,23 +80,31 @@ public class MagicItemsSearch {
         return selection;
     }
 
-    // Perform Linear Search and calculate average comparisons
-    public static void performLinearSearches(List<String> sortedArr, List<String> targets) {
+    // Perform Linear and Binary Searches, then calculate average comparisons
+    public static void performSearches(List<String> searchList) {
         int totalLinearComparisons = 0;
+        int totalBinaryComparisons = 0;
 
-        for (String target : targets) {
-            //using an array to pass by reference
+        for (String searchItem : searchList) {
             int[] linearCount = {0};
-            // Perform a linear search on the sorted array for the current target,
-            // and store the number of comparisons in `linearCount[0]`
-            linearSearch(sortedArr, target, linearCount);
-            //add to total
+            int[] binaryCount = {0};
+
+            // Perform a linear search on the search list for the current item
+            linearSearch(searchList, searchItem, linearCount);
             totalLinearComparisons += linearCount[0];
-            System.out.println("Linear comparisons for " + target + ": " + linearCount[0]);
+            System.out.println("Linear comparisons for " + searchItem + ": " + linearCount[0]);
+
+            // Perform a binary search on the sorted search list for the current item
+            binarySearch(searchList, searchItem, binaryCount);
+            totalBinaryComparisons += binaryCount[0];
+            System.out.println("Binary comparisons for " + searchItem + ": " + binaryCount[0]);
         }
 
-        double averageLinear = (double) totalLinearComparisons / targets.size();
+        double averageLinear = (double) totalLinearComparisons / searchList.size();
+        double averageBinary = (double) totalBinaryComparisons / searchList.size();
+
         System.out.printf("\nAverage Linear Search Comparisons: %.2f\n", averageLinear);
+        System.out.printf("Average Binary Search Comparisons: %.2f\n", averageBinary);
     }
 
     public static void main(String[] args) {
@@ -101,10 +128,12 @@ public class MagicItemsSearch {
         int[] comparisonCount = {0};
         selectionSort(sortedItems, comparisonCount);
 
-        // Randomly select 42 items for search tests
-        List<String> targets = randomSelection(sortedItems, 42);
+        // Randomly select 42 items for search tests and sort them
+        List<String> searchList = randomSelection(sortedItems, 42);
+        selectionSort(searchList, new int[]{0});
 
-        // Perform linear searches, then calculate average comparisons
-        performLinearSearches(sortedItems, targets);
+        // Perform both linear and binary searches on the sorted search list,
+        // then calculate and print average comparisons
+        performSearches(searchList);
     }
 }
