@@ -166,7 +166,7 @@ public class Assignment3 {
         }
     }
 
-    // Method to print the adjacency list 
+    // Method to print the adjacency list
     private static void printAdjacencyList(Map<String, TreeSet<String>> adjacencyList) {
         if (adjacencyList.isEmpty()) {
             System.out.println("No data for this graph.");
@@ -247,8 +247,93 @@ public class Assignment3 {
         }
     }
 
+    // Binary Search Tree Implementation
+    static class BinarySearchTree {
+        // Node class for BST
+        static class Node {
+            String value; // Value of the node
+            Node left, right; // Left and right child nodes
+
+            Node(String value) {
+                this.value = value;
+                this.left = this.right = null;
+            }
+        }
+
+        private Node root; // Root of the BST
+
+        // Method to insert a new value into the BST
+        public void insert(String value) {
+            StringBuilder path = new StringBuilder(); // To store the path to the node
+            root = insertRecursive(root, value, path);
+            System.out.println("Inserted " + value + " with path: " + path);
+        }
+
+        // Helper method for recursive insertion
+        private Node insertRecursive(Node current, String value, StringBuilder path) {
+            if (current == null) {
+                return new Node(value); // Create a new node if position is empty
+            }
+
+            // Compare and decide the direction to traverse
+            if (value.compareTo(current.value) < 0) {
+                path.append("L, ");
+                current.left = insertRecursive(current.left, value, path);
+            } else if (value.compareTo(current.value) > 0) {
+                path.append("R, ");
+                current.right = insertRecursive(current.right, value, path);
+            }
+            return current;
+        }
+
+        // Method to print the BST using in-order traversal
+        public void inOrderTraversal() {
+            System.out.println("In-Order Traversal of BST:");
+            inOrderRecursive(root);
+            System.out.println();
+        }
+
+        // Helper method for recursive in-order traversal
+        private void inOrderRecursive(Node node) {
+            if (node == null) {
+                return;
+            }
+            inOrderRecursive(node.left);
+            System.out.print(node.value + " ");
+            inOrderRecursive(node.right);
+        }
+    }
+
+    // Main Method Addition for BST Feature
+    public static void processMagicItems(String fileName) {
+        BinarySearchTree bst = new BinarySearchTree();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String item;
+
+            // Read each item and insert it into the BST
+            while ((item = br.readLine()) != null) {
+                item = item.trim(); // Remove extra spaces
+                if (!item.isEmpty()) {
+                    bst.insert(item);
+                }
+            }
+
+            // Print the BST with in-order traversal
+            bst.inOrderTraversal();
+        } catch (IOException e) {
+            System.err.println("Error reading magicitems.txt: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
-        String fileName = "assignment3/graphs1.txt"; // finds file 
-        processGraphs(fileName);
+        String graphFileName = "assignment3/graphs1.txt";
+        String magicItemsFileName = "assignment3/magicitems.txt";
+
+        // Process graphs
+        processGraphs(graphFileName);
+
+        // Process magic items into BST
+        processMagicItems(magicItemsFileName);
     }
 }
