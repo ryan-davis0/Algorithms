@@ -246,94 +246,144 @@ public class Assignment3 {
             }
         }
     }
+ // Binary Search Tree Implementation
+static class BinarySearchTree {
+    // Node class representing each node in the BST
+    static class Node {
+        String value; // The value stored in the node
+        Node left, right; // Left and right children of the node
 
-    // Binary Search Tree Implementation
-    static class BinarySearchTree {
-        // Node class for BST
-        static class Node {
-            String value; // Value of the node
-            Node left, right; // Left and right child nodes
-
-            Node(String value) {
-                this.value = value;
-                this.left = this.right = null;
-            }
-        }
-
-        private Node root; // Root of the BST
-
-        // Method to insert a new value into the BST
-        public void insert(String value) {
-            StringBuilder path = new StringBuilder(); // To store the path to the node
-            root = insertRecursive(root, value, path);
-            System.out.println("Inserted " + value + " with path: " + path);
-        }
-
-        // Helper method for recursive insertion
-        private Node insertRecursive(Node current, String value, StringBuilder path) {
-            if (current == null) {
-                return new Node(value); // Create a new node if position is empty
-            }
-
-            // Compare and decide the direction to traverse
-            if (value.compareTo(current.value) < 0) {
-                path.append("L, ");
-                current.left = insertRecursive(current.left, value, path);
-            } else if (value.compareTo(current.value) > 0) {
-                path.append("R, ");
-                current.right = insertRecursive(current.right, value, path);
-            }
-            return current;
-        }
-
-        // Method to print the BST using in-order traversal
-        public void inOrderTraversal() {
-            System.out.println("In-Order Traversal of BST:");
-            inOrderRecursive(root);
-            System.out.println();
-        }
-
-        // Helper method for recursive in-order traversal
-        private void inOrderRecursive(Node node) {
-            if (node == null) {
-                return;
-            }
-            inOrderRecursive(node.left);
-            System.out.print(node.value + " ");
-            inOrderRecursive(node.right);
+        // Constructor to initialize a node with a value
+        Node(String value) {
+            this.value = value;
+            this.left = this.right = null;
         }
     }
 
-    // Main Method Addition for BST Feature
-    public static void processMagicItems(String fileName) {
-        BinarySearchTree bst = new BinarySearchTree();
+    private Node root; // Root of the BST
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String item;
+    // Inserts a value into the BST and prints the path taken
+    public void insert(String value) {
+        StringBuilder path = new StringBuilder(); // Tracks the path to insertion
+        root = insertRecursive(root, value, path); // Recursive insertion
+        System.out.println("Inserted " + value + " with path: " + path); // Log the insertion
+    }
 
-            // Read each item and insert it into the BST
-            while ((item = br.readLine()) != null) {
-                item = item.trim(); // Remove extra spaces
-                if (!item.isEmpty()) {
-                    bst.insert(item);
+    // Recursive helper method to insert a value into the BST
+    private Node insertRecursive(Node current, String value, StringBuilder path) {
+        if (current == null) { // Base case: Insert the value here if the spot is empty
+            return new Node(value);
+        }
+        // Compare value to decide whether to go left or right
+        if (value.compareTo(current.value) < 0) { // Go left if value is smaller
+            path.append("L, ");
+            current.left = insertRecursive(current.left, value, path);
+        } else if (value.compareTo(current.value) > 0) { // Go right if value is larger
+            path.append("R, ");
+            current.right = insertRecursive(current.right, value, path);
+        }
+        return current; // Return the unchanged node
+    }
+
+    // Performs an in-order traversal of the BST and prints the elements
+    public void inOrderTraversal() {
+        System.out.println("In-Order Traversal of BST:"); // Header for traversal output
+        inOrderRecursive(root); // Recursive traversal
+        System.out.println(); // End the output with a new line
+    }
+
+    // Recursive helper method for in-order traversal
+    private void inOrderRecursive(Node node) {
+        if (node == null) return; // Base case: Stop if the node is null
+        inOrderRecursive(node.left); // Visit left subtree
+        System.out.print(node.value + " "); // Print the node value
+        inOrderRecursive(node.right); // Visit right subtree
+    }
+
+    // Finds a value in the BST and prints the path and number of comparisons
+    public int find(String value) {
+        StringBuilder path = new StringBuilder(); // Tracks the path to the value
+        int comparisons = findRecursive(root, value, path, 0); // Recursive search
+        if (comparisons != -1) { // If the value is found
+            System.out.println("Found " + value + " with path: " + path + " in " + comparisons + " comparisons.");
+        } else { // If the value is not found
+            System.out.println(value + " not found in BST.");
+        }
+        return comparisons; // Return the number of comparisons made
+    }
+
+    // Recursive helper method to find a value in the BST
+    private int findRecursive(Node current, String value, StringBuilder path, int comparisons) {
+        if (current == null) return -1; // Base case: Value not found
+        comparisons++; // Increment the comparison count
+        if (value.equals(current.value)) return comparisons; // Value found
+        // Go left or right depending on the comparison
+        if (value.compareTo(current.value) < 0) {
+            path.append("L, ");
+            return findRecursive(current.left, value, path, comparisons);
+        } else {
+            path.append("R, ");
+            return findRecursive(current.right, value, path, comparisons);
+        }
+    }
+}
+
+// Processes magic items by reading from a file and inserting them into the BST
+public static void processMagicItems(String fileName, BinarySearchTree bst) {
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        String item;
+        while ((item = br.readLine()) != null) { // Read each line from the file
+            item = item.trim(); // Remove leading/trailing spaces
+            if (!item.isEmpty()) { // Skip empty lines
+                bst.insert(item); // Insert the item into the BST
+            }
+        }
+        bst.inOrderTraversal(); // Perform in-order traversal to display BST elements
+    } catch (IOException e) { // Handle file reading errors
+        System.err.println("Error reading magicitems.txt: " + e.getMessage());
+    }
+}
+
+// Looks up magic items in the BST and calculates average comparisons for search
+public static void lookupMagicItems(String fileName, BinarySearchTree bst) {
+    int totalComparisons = 0; // Tracks total comparisons made
+    int itemCount = 0; // Counts the number of items found
+
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        String item;
+        while ((item = br.readLine()) != null) { // Read each line from the file
+            item = item.trim(); // Remove leading/trailing spaces
+            if (!item.isEmpty()) { // Skip empty lines
+                int comparisons = bst.find(item); // Search for the item in the BST
+                if (comparisons != -1) { // If the item is found
+                    totalComparisons += comparisons; // Add to total comparisons
+                    itemCount++; // Increment item count
                 }
             }
-
-            // Print the BST with in-order traversal
-            bst.inOrderTraversal();
-        } catch (IOException e) {
-            System.err.println("Error reading magicitems.txt: " + e.getMessage());
         }
+
+        if (itemCount > 0) { // Calculate and print average comparisons if items were found
+            double averageComparisons = (double) totalComparisons / itemCount;
+            System.out.printf("Overall Average Comparisons: %.2f%n", averageComparisons);
+        } else { // Handle case where no items were found
+            System.out.println("No items found for lookup.");
+        }
+    } catch (IOException e) { // Handle file reading errors
+        System.err.println("Error reading magicitems-find-in-bst.txt: " + e.getMessage());
     }
+}
+
 
     public static void main(String[] args) {
         String graphFileName = "assignment3/graphs1.txt";
         String magicItemsFileName = "assignment3/magicitems.txt";
+        String magicItemsFindFileName = "assignment3/magicitems-find-in-bst.txt";
 
-        // Process graphs
         processGraphs(graphFileName);
 
-        // Process magic items into BST
-        processMagicItems(magicItemsFileName);
+        BinarySearchTree bst = new BinarySearchTree();
+        processMagicItems(magicItemsFileName, bst);
+
+        lookupMagicItems(magicItemsFindFileName, bst);
     }
 }
