@@ -8,11 +8,13 @@ public class Assignment3 {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             boolean isNewGraph = false; // Tracks whether a new graph has started
-            Map<String, Integer> vertexMap = new HashMap<>(); // Maps vertex IDs to matrix indices
+            Map<String, Integer> vertexMap = new HashMap<>(); 
+            // Maps each vertex ID (String) to a unique integer index used in the adjacency matrix.
+            Map<String, List<String>> adjacencyList = new HashMap<>(); // Stores adjacency list for the graph
             int vertexCount = 0; // Keeps track of the total number of vertices in the current graph
             int[][] adjacencyMatrix = null; // The adjacency matrix for the current graph
 
-            System.out.println("Adjacency Matrices for Graphs");
+            System.out.println("Adjacency Representations for Graphs");
 
             // Read the file line by line
             while ((line = br.readLine()) != null) {
@@ -24,10 +26,13 @@ public class Assignment3 {
                         // Print the adjacency matrix if there is a previous graph 
                         System.out.println("\nGraph:");
                         printMatrix(adjacencyMatrix, vertexMap);
+                        System.out.println("\nAdjacency List:");
+                        printAdjacencyList(adjacencyList);
                     }
                     // Initialize for the new graph
                     isNewGraph = true;
                     vertexMap.clear(); // Clear the vertex map for the new graph
+                    adjacencyList.clear(); // Clear the adjacency list for the new graph
                     vertexCount = 0; // Reset vertex count
                     adjacencyMatrix = null; // Reset adjacency matrix
                 } else if (line.startsWith("add vertex")) {
@@ -37,6 +42,7 @@ public class Assignment3 {
                     // Check if the vertex is not already added
                     if (!vertexMap.containsKey(vertexId)) {
                         vertexMap.put(vertexId, vertexCount); // Map vertex ID to the current matrix index
+                        adjacencyList.put(vertexId, new ArrayList<>()); // Initialize adjacency list for the vertex
                         vertexCount++; // Increment the vertex count
 
                         // Resize the adjacency matrix to accommodate the new vertex
@@ -53,9 +59,13 @@ public class Assignment3 {
                         int uIndex = vertexMap.get(u); // Get the matrix index for vertex u
                         int vIndex = vertexMap.get(v); // Get the matrix index for vertex v
 
-                        // Add both directions 
+                        // Add both directions in matrix
                         adjacencyMatrix[uIndex][vIndex] = 1;
                         adjacencyMatrix[vIndex][uIndex] = 1; 
+
+                        // Add both directions in the adjacency list
+                        adjacencyList.get(u).add(v);
+                        adjacencyList.get(v).add(u);
                     } else {
                         // Print an error if the edge references undefined vertices
                         System.err.println("Invalid edge with undefined vertices: " + line);
@@ -67,6 +77,8 @@ public class Assignment3 {
             if (isNewGraph) {
                 System.out.println("\nGraph:");
                 printMatrix(adjacencyMatrix, vertexMap);
+                System.out.println("\nAdjacency List:");
+                printAdjacencyList(adjacencyList);
             }
         } catch (IOException e) {
             // Handle any errors that occur during file reading
@@ -125,8 +137,22 @@ public class Assignment3 {
         }
     }
 
+    // Method to print the adjacency list
+    private static void printAdjacencyList(Map<String, List<String>> adjacencyList) {
+        if (adjacencyList.isEmpty()) {
+            System.out.println("No data for this graph.");
+            return;
+        }
+// Iterate through each vertex in the adjacency list
+        for (Map.Entry<String, List<String>> entry : adjacencyList.entrySet()) {
+              // Print the vertex (key) 
+            System.out.print(entry.getKey() + ": ");
+            System.out.println(String.join(", ", entry.getValue())); // Print neighbors
+        }
+    }
+
     public static void main(String[] args) {
-        String fileName = "assignment3/graphs1.txt"; 
+        String fileName = "assignment3/graphs1.txt"; //finds file
         processGraphs(fileName);
     }
 }
