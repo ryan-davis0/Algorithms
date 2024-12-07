@@ -34,53 +34,39 @@ public class GraphProcessor {
         }
     }
 
-    /**
-     * Processes the graph file and constructs a linked object representation for directed, weighted graphs.
-     * The graph file contains commands to add vertices and edges.
-     * @param fileName Path to the input file containing graph data
-     */
     public static void processGraphs(String fileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line; // Stores the current line read from the file
-            boolean isNewGraph = false; // Flag to indicate the start of a new graph
-            Map<String, Vertex> linkedGraph = new HashMap<>(); // Representation of the graph as vertices and edges
+            String line;
+            boolean isNewGraph = false;
+            Map<String, Vertex> linkedGraph = new HashMap<>();
 
             System.out.println("SSSP Results for Graphs");
 
-            // Read file line by line
             while ((line = br.readLine()) != null) {
-                line = line.trim(); // Remove unnecessary whitespace
+                line = line.trim();
 
-                // Check if the line indicates a new graph
                 if (line.startsWith("new graph")) {
                     if (isNewGraph) {
                         System.out.println("\nGraph:");
-                        runSSSP(linkedGraph, "1"); // Run Single Source Shortest Path (SSSP) for the current graph
+                        runSSSP(linkedGraph, "1");
                     }
                     isNewGraph = true;
-                    linkedGraph.clear(); // Clear the graph representation for the new graph
-                }
-                // Check if the line adds a new vertex
-                else if (line.startsWith("add vertex")) {
+                    linkedGraph.clear();
+                } else if (line.startsWith("add vertex")) {
                     String vertexId = line.replace("add vertex", "").trim();
-                    linkedGraph.put(vertexId, new Vertex(vertexId)); // Add the vertex to the graph
-                }
-                // Check if the line adds a new edge
-                else if (line.startsWith("add edge")) {
-                    // Parse the edge input: "add edge 2 - 5 -4"
+                    linkedGraph.put(vertexId, new Vertex(vertexId));
+                } else if (line.startsWith("add edge")) {
                     String[] parts = line.replace("add edge", "").trim().split("\\s+");
 
-                    // Validate edge format
                     if (parts.length < 4) {
                         System.err.println("Invalid edge format: " + line);
                         continue;
                     }
 
-                    String u = parts[0]; // Source vertex
-                    String v = parts[2]; // Destination vertex
-                    int weight = Integer.parseInt(parts[parts.length - 1]); // Edge weight
+                    String u = parts[0];
+                    String v = parts[2];
+                    int weight = Integer.parseInt(parts[parts.length - 1]);
 
-                    // Add edge if vertices exist in the graph
                     if (linkedGraph.containsKey(u) && linkedGraph.containsKey(v)) {
                         linkedGraph.get(u).addEdge(linkedGraph.get(v), weight);
                     } else {
@@ -89,40 +75,30 @@ public class GraphProcessor {
                 }
             }
 
-            // Process the last graph if it exists
             if (isNewGraph) {
                 System.out.println("\nGraph:");
-                runSSSP(linkedGraph, "1"); // Run SSSP for the last graph
+                runSSSP(linkedGraph, "1");
             }
         } catch (IOException e) {
             System.err.println("Error reading the file: " + e.getMessage());
         }
     }
 
-    /**
-     * Runs the Single Source Shortest Path (SSSP) algorithm using the Bellman-Ford method.
-     * Prints the shortest path costs and paths from a source vertex to all other vertices.
-     * @param graph The graph represented as a map of vertex IDs to Vertex objects
-     * @param sourceId The ID of the source vertex
-     */
     public static void runSSSP(Map<String, Vertex> graph, String sourceId) {
-        // Check if the source vertex exists in the graph
         if (!graph.containsKey(sourceId)) {
             System.out.println("Source vertex " + sourceId + " not found in the graph.");
             return;
         }
 
-        Map<String, Integer> distances = new HashMap<>(); // Stores shortest distances from the source
-        Map<String, String> predecessors = new HashMap<>(); // Stores predecessors for path reconstruction
+        Map<String, Integer> distances = new HashMap<>();
+        Map<String, String> predecessors = new HashMap<>();
 
-        // Initialize distances and predecessors
         for (String vertexId : graph.keySet()) {
-            distances.put(vertexId, Integer.MAX_VALUE); // Set all distances to infinity
-            predecessors.put(vertexId, null); // Set no predecessor initially
+            distances.put(vertexId, Integer.MAX_VALUE);
+            predecessors.put(vertexId, null);
         }
-        distances.put(sourceId, 0); // Distance to the source is 0
+        distances.put(sourceId, 0);
 
-        // Perform multiple passes through all vertices to update paths
         int verticesCount = graph.size();
         for (int i = 1; i < verticesCount; i++) {
             for (Vertex vertex : graph.values()) {
@@ -136,7 +112,6 @@ public class GraphProcessor {
             }
         }
 
-        // Check for negative-weight cycles
         for (Vertex vertex : graph.values()) {
             for (Edge edge : vertex.edges) {
                 if (distances.get(vertex.id) != Integer.MAX_VALUE
@@ -147,7 +122,6 @@ public class GraphProcessor {
             }
         }
 
-        // Print results for all vertices except the source
         for (String vertexId : graph.keySet()) {
             if (!vertexId.equals(sourceId)) {
                 if (distances.get(vertexId) == Integer.MAX_VALUE) {
@@ -160,23 +134,102 @@ public class GraphProcessor {
         }
     }
 
-    /**
-     * Reconstructs the shortest path from the predecessor map.
-     * @param predecessors Map of vertex IDs to their predecessors
-     * @param target The target vertex ID
-     * @return A string representation of the path
-     */
     private static String getPath(Map<String, String> predecessors, String target) {
         List<String> path = new ArrayList<>();
         for (String at = target; at != null; at = predecessors.get(at)) {
             path.add(at);
         }
-        Collections.reverse(path); // Reverse to get the correct order
+        Collections.reverse(path);
         return String.join(" --> ", path);
     }
 
+    static class Spice {
+        String name;
+        double totalPrice;
+        int quantity;
+        double unitPrice;
+
+        public Spice(String name, double totalPrice, int quantity) {
+            this.name = name;
+            this.totalPrice = totalPrice;
+            this.quantity = quantity;
+            this.unitPrice = totalPrice / quantity;
+        }
+    }
+
+    static class Knapsack {
+        int capacity;
+
+        public Knapsack(int capacity) {
+            this.capacity = capacity;
+        }
+    }
+
+    public static void processSpice(String filename) {
+        List<Spice> spices = new ArrayList<>();
+        List<Knapsack> knapsacks = new ArrayList<>();
+    
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("spice name")) {
+                    String[] parts = line.split(";");
+                    String name = parts[0].split("=")[1].trim();
+                    double totalPrice = Double.parseDouble(parts[1].split("=")[1].trim());
+    
+                    // Remove all non-digit characters from the quantity string (e.g., trailing semicolon)
+                    String quantityStr = parts[2].split("=")[1].trim().replaceAll("[^\\d]", "");
+                    int quantity = Integer.parseInt(quantityStr);
+    
+                    spices.add(new Spice(name, totalPrice, quantity));
+                } else if (line.startsWith("knapsack capacity")) {
+                    // Parse knapsack capacity
+                    String capacityStr = line.split("=")[1].trim().replaceAll("[^\\d]", "");
+                    int capacity = Integer.parseInt(capacityStr);
+                    knapsacks.add(new Knapsack(capacity));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+            return;
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing a number: " + e.getMessage());
+            return;
+        }
+    
+        // Sort spices by unit price in descending order
+        spices.sort((a, b) -> Double.compare(b.unitPrice, a.unitPrice));
+    
+        // Process each knapsack
+        for (Knapsack knapsack : knapsacks) {
+            int remainingCapacity = knapsack.capacity;
+            double totalValue = 0;
+            List<String> contents = new ArrayList<>();
+    
+            for (Spice spice : spices) {
+                if (remainingCapacity <= 0) break;
+    
+                int takeQuantity = Math.min(remainingCapacity, spice.quantity);
+                totalValue += takeQuantity * spice.unitPrice;
+                remainingCapacity -= takeQuantity;
+    
+                if (takeQuantity > 0) {
+                    contents.add(takeQuantity + " scoop(s) of " + spice.name);
+                }
+            }
+    
+            // Output the result for the current knapsack
+            System.out.println("Knapsack of capacity " + knapsack.capacity + " is worth " + totalValue + " quatloos and contains " + String.join(", ", contents) + ".");
+        }
+    }
+
     public static void main(String[] args) {
-        String graphFileName = "assignment4/graphs2.txt"; // Input file containing graph data
-        processGraphs(graphFileName); // Start processing the graph file
+        String graphFileName = "assignment4/graphs2.txt";
+        processGraphs(graphFileName);
+
+        String spiceFileName = "assignment4/spice.txt";
+        System.out.println("\nSpice Heist Results:");
+        processSpice(spiceFileName);
     }
 }
